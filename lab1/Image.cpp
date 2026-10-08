@@ -5,7 +5,7 @@
 #include "stb_image.h"
 #include "stb_image_write.h"
 
-int Image::getWidth() const{
+int Image::getWidth() const {
 	return width;
 }
 
@@ -13,14 +13,14 @@ int Image::getHeight() const {
 	return height;
 }
 
-bool Image::isEmpty() const{
+bool Image::isEmpty() const {
 	return width == 0 || height == 0;
 }
 
 bool Image::load(const std::string& path) {
 	int w{}, h{}, n{};
-	unsigned char* raw = stbi_load(path.c_str(), &w, &h, &n, 3);
-	if (!raw)
+	unsigned char* imgData = stbi_load(path.c_str(), &w, &h, &n, 3);
+	if (!imgData)
 		return false;
 
 	width = w;
@@ -29,12 +29,12 @@ bool Image::load(const std::string& path) {
 
 	for (int i = 0; i < h; ++i) {
 		for (int j = 0; j < w; ++j) {
-			const unsigned char* p = raw + ((size_t)i * w + j) * 3;
+			const unsigned char* p = imgData + ((size_t)i * w + j) * 3;
 			img[i][j] = Pixel(p[0], p[1], p[2]);
 		}
 	}
 
-	stbi_image_free(raw);
+	stbi_image_free(imgData);
 	return true;
 }
 
@@ -73,24 +73,24 @@ Image Image::bilinearInterpolation(int newWidth, int newHeight) {
 	double kY = (double)height / newHeight;
 
 	for (int y = 0; y < newHeight; ++y) {
-		double fy = (y + 0.5) * kY - 0.5;
-		if (fy < 0)
-			fy = 0;
+		double oldY = (y + 0.5) * kY - 0.5;
+		if (oldY < 0)
+			oldY = 0;
 
-		int y0 = (int)fy;
-		int y1 = clampInt(y0 + 1, 0, height - 1);
-		y0 = clampInt(y0, 0, height - 1);
-		double dy = fy - y0;
+		int y0 = (int)oldY;
+		int y1 = clampValue(y0 + 1, 0, height - 1);
+		y0 = clampValue(y0, 0, height - 1);
+		double dy = oldY - y0;
 
 		for (int x = 0; x < newWidth; ++x) {
-			double fx = (x + 0.5) * kX - 0.5;
-			if (fx < 0)
-				fx = 0;
+			double oldX = (x + 0.5) * kX - 0.5;
+			if (oldX < 0)
+				oldX = 0;
 
-			int x0 = (int)fx;
-			int x1 = clampInt(x0 + 1, 0, width - 1);
-			x0 = clampInt(x0, 0, width - 1);
-			double dx = fx - x0;
+			int x0 = (int)oldX;
+			int x1 = clampValue(x0 + 1, 0, width - 1);
+			x0 = clampValue(x0, 0, width - 1);
+			double dx = oldX - x0;
 
 			const Pixel& p00 = img[y0][x0];
 			const Pixel& p01 = img[y0][x1];
@@ -114,10 +114,10 @@ Image Image::bilinearInterpolation(int newWidth, int newHeight) {
 	return result;
 }
 
-std::string Image::extensionOf(const std::string& path){
+std::string Image::extensionOf(const std::string& path) {
 	size_t dot = path.find_last_of('.');
 
-	if (dot == std::string::npos) 
+	if (dot == std::string::npos)
 		return "";
 
 	std::string ext = path.substr(dot + 1);
@@ -127,7 +127,7 @@ std::string Image::extensionOf(const std::string& path){
 	return ext;
 }
 
-int Image::clampInt(int v, int lo, int hi) {
+int Image::clampValue(int v, int lo, int hi) {
 	if (v < lo)
 		return lo;
 	if (v > hi)

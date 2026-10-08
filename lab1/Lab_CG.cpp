@@ -33,7 +33,7 @@ int main()
 
     Image dst;
     dst = src.bilinearInterpolation(newW, newH);
-   
+
     if (!dst.save(outPath)) {
         std::cout << "Ошибка сохранения файла (проверьте расширение: png/jpg).\n";
         return 1;
