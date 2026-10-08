@@ -4,7 +4,7 @@
 int main()
 {
     std::string inPath, outPath;
-    double scale;
+    double scale{};
 
     std::cout << "Путь к исходному изображению (png/jpg): ";
     std::getline(std::cin, inPath);

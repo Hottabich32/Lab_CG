@@ -18,8 +18,6 @@ bool Image::isEmpty() const{
 }
 
 bool Image::load(const std::string& path) {
-	std::string ext = extensionOf(path);
-
 	int w{}, h{}, n{};
 	unsigned char* raw = stbi_load(path.c_str(), &w, &h, &n, 3);
 	if (!raw)
@@ -66,7 +64,7 @@ bool Image::save(const std::string& path) const {
 }
 
 Image Image::bilinearInterpolation(int newWidth, int newHeight) {
-	if (isEmpty() || newWidth == 0 || newHeight == 0)
+	if (isEmpty() || newWidth <= 0 || newHeight <= 0)
 		return Image();
 
 	Image result(newWidth, newHeight);
